@@ -21,6 +21,8 @@ ManualFuncs = {
          [ "cv.Mat.depth", "int", ["/C"], [] ],
          [ "cv.Mat.channels", "int", ["/C"], [] ],
          [ "cv.Mat.size", "Size", ["/C"], [] ],
+         [ "cv.Mat.clone", "Mat", ["/C"], [] ],
+         [ "cv.Mat.convertTo", "void", ["/C"], [ ["Mat", "OutputArray"], ["int", "rtype"], ["double", "scale"]] ],
     ]
 }
 
@@ -57,8 +59,8 @@ renamed_funcs = {
     "cv_objdetect_CascadeClassifier_CascadeClassifier_S": "for_file",
     "cv_video_calcOpticalFlowSF_MMMIIIDDIDDDIDDD" : "calc_optical_flow_full",
     "cv_video_KalmanFilter_KalmanFilter_IIII" : "for_params",
-    "cv_video_BackgroundSubtractorMOG_BackgroundSubtractorMOG_IIDD" : "for_params", 
-    "cv_video_BackgroundSubtractorMOG2_BackgroundSubtractorMOG2_IFB" : "for_params", 
+    "cv_video_BackgroundSubtractorMOG_BackgroundSubtractorMOG_IIDD" : "for_params",
+    "cv_video_BackgroundSubtractorMOG2_BackgroundSubtractorMOG2_IFB" : "for_params",
 }
 
 class_ignore_list = (
@@ -73,7 +75,7 @@ const_ignore_list = (
     "CV_IS_CONT_MAT", "CV_RNG_COEFF", "IPL_IMAGE_MAGIC_VAL",
     "CV_SET_ELEM_FREE_FLAG", "CV_FOURCC_DEFAULT",
     "CV_WHOLE_ARR", "CV_WHOLE_SEQ", "CV_PI", "CV_LOG2",
-    "CV_TYPE_NAME_IMAGE", 
+    "CV_TYPE_NAME_IMAGE",
 
 )
 
@@ -169,7 +171,7 @@ pub mod $m {
     use std::ffi::{ CStr, CString };
     use std::mem::transmute;
     use libc::types::common::c95::c_void;
-    
+
     $module_import
     $code
 }
@@ -639,7 +641,7 @@ class TypeInfo():
                     #include "opencv2/opencv_modules.hpp"
                     #include "opencv2/$module/$module.hpp"
                     using namespace cv;
-                    extern "C" { 
+                    extern "C" {
                         void* cv_new_$rtype() { return new std::$cpptype(); }
                         void cv_delete_$rtype(void* ptr) { delete (($cpptype*) ptr); }
                         int cv_${rtype}_len(void* ptr) { return (($cpptype*) ptr)->size(); }
@@ -982,7 +984,7 @@ class RustWrapperGenerator(object):
         self.moduleRustCode.write(Template("""
             #[allow(dead_code)]
             pub struct $cname {
-                pub ptr: *mut c_void 
+                pub ptr: *mut c_void
             }
             impl Drop for $cname {
                 fn drop(&mut self) {
